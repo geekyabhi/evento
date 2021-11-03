@@ -15,6 +15,9 @@ connectDB()
 				message: `Server is running on port ${PORT}`,
 			});
 		});
+		const apis = require("./apis/api");
+		console.log(`All apis connected`.magenta);
+		app.use("/api", apis());
 	})
 	.catch((e) => {
 		console.log(`Database could not be connnected ${e}`.red);
