@@ -22,6 +22,13 @@ const SocietySchema = mongoose.Schema({
 		type: String,
 		required: [true, "Please enter password"],
 	},
+	events: [
+		{
+			type: mongoose.Schema.Types.ObjectId,
+			ref: "Event",
+			required: true,
+		},
+	],
 });
 
 SocietySchema.methods.matchPassword = async function (enteredPassword) {

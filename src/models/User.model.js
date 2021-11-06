@@ -35,19 +35,6 @@ const UserSchema = mongoose.Schema(
 				}
 			},
 		},
-		isAdmin: {
-			type: Boolean,
-			default: false,
-		},
-		society: {
-			type: mongoose.Schema.Types.ObjectId,
-			ref: "Society",
-			default: "61829ff4dbdb48788a122c9b",
-		},
-		isSuperAdmin: {
-			type: Boolean,
-			default: false,
-		},
 		tokens: [{ type: String }],
 	},
 	{
