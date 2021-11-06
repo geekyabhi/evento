@@ -69,7 +69,6 @@ const login = async (req, res) => {
 					_id: user._id,
 					username: user.username,
 					token: currentToken,
-					tokens: user.tokens,
 				},
 			});
 		} else {

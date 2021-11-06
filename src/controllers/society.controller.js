@@ -40,7 +40,6 @@ const addSociety = async (req, res) => {
 				name: society.name,
 				image: society.image,
 				handle: society.handle,
-				tokens: society.tokens,
 			},
 		});
 	} catch (e) {
@@ -68,7 +67,6 @@ const loginSociety = async (req, res) => {
 					name: society.name,
 					handle: society.handle,
 					token: currentToken,
-					tokens: society.tokens,
 				},
 			});
 		}
@@ -161,7 +159,6 @@ const updateSociety = async (req, res) => {
 				name: society.name,
 				image: society.image,
 				handle: society.handle,
-				tokens: society.tokens,
 			},
 		});
 	} catch (e) {

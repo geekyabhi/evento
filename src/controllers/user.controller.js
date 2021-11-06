@@ -4,7 +4,7 @@ const generateToken = require("../utils/generateToken");
 
 const register = async (req, res) => {
 	try {
-		const { name, collegeId, password, year } = req.body;
+		const { name, collegeId, password, year, image, gender } = req.body;
 		if (!name) {
 			return res.status(400).send({
 				success: false,
@@ -30,7 +30,14 @@ const register = async (req, res) => {
 				error: "User with same college id already exist",
 			});
 		}
-		const user = new User({ name, collegeId, password, year });
+		const user = new User({
+			name,
+			collegeId,
+			password,
+			year,
+			image,
+			gender,
+		});
 		const savedUser = await user.save();
 		res.status(200).send({
 			success: true,
@@ -38,9 +45,9 @@ const register = async (req, res) => {
 				_id: savedUser._id,
 				name: savedUser.name,
 				collegeId: savedUser.collegeId,
-				isAdmin: savedUser.isAdmin,
-				society: savedUser.society,
 				year: savedUser.year,
+				image: savedUser.image,
+				gender: savedUser.gender,
 			},
 		});
 	} catch (e) {
@@ -67,9 +74,7 @@ const login = async (req, res) => {
 				error: "Please enter your password",
 			});
 		}
-		const user = await User.findOne({ collegeId: collegeId }).populate(
-			"society"
-		);
+		const user = await User.findOne({ collegeId: collegeId });
 		if (user && (await user.matchPassword(password))) {
 			const currentToken = generateToken(user._id);
 			const updatedTokens = [...user.tokens, currentToken];
@@ -81,11 +86,10 @@ const login = async (req, res) => {
 					_id: user._id,
 					name: user.name,
 					collegeId: user.collegeId,
-					isAdmin: user.isAdmin,
-					society: user.society,
 					year: user.year,
+					image: user.image,
+					gender: user.gender,
 					token: currentToken,
-					tokens: user.tokens,
 				},
 			});
 		} else {
@@ -174,11 +178,22 @@ const find = async (req, res) => {
 
 const update = async (req, res) => {
 	try {
-		const { name, collegeId, password, year } = req.body;
+		const { name, collegeId, password, year, image, gender } = req.body;
+
+		const preUser = await User.findOne({ collegeId: collegeId });
+		if (preUser && String(preUser._id) !== String(req.user._id)) {
+			return res.status(400).send({
+				success: false,
+				error: "User with same college id already exist",
+			});
+		}
+
 		const user = req.user;
 		user.name = name || user.name;
 		user.collegeId = collegeId || user.collegeId;
 		user.year = year || user.year;
+		user.image = image || user.image;
+		user.gender = gender || user.gender;
 
 		if (password) {
 			user.password = password;
@@ -190,9 +205,9 @@ const update = async (req, res) => {
 				_id: savedUser._id,
 				name: savedUser.name,
 				collegeId: savedUser.collegeId,
-				isAdmin: savedUser.isAdmin,
-				society: savedUser.society,
 				year: savedUser.year,
+				image: savedUser.image,
+				gender: savedUser.gender,
 			},
 		});
 	} catch (e) {
@@ -215,9 +230,9 @@ const remove = async (req, res) => {
 				_id: savedUser._id,
 				name: savedUser.name,
 				collegeId: savedUser.collegeId,
-				isAdmin: savedUser.isAdmin,
-				society: savedUser.society,
 				year: savedUser.year,
+				image: savedUser.image,
+				gender: savedUser.gender,
 			},
 		});
 	} catch (e) {

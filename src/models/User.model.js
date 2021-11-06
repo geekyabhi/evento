@@ -1,7 +1,5 @@
 const mongoose = require("mongoose");
 const bcrypt = require("bcrypt");
-const jwt = require("jsonwebtoken");
-const Society = require("./Society.model");
 
 const UserSchema = mongoose.Schema(
 	{
@@ -27,6 +25,11 @@ const UserSchema = mongoose.Schema(
 				}
 			},
 		},
+		gender: {
+			type: String,
+			enum: ["Male", "Female", "None"],
+			default: "None",
+		},
 		year: {
 			type: Number,
 			validate(value) {
@@ -35,6 +38,15 @@ const UserSchema = mongoose.Schema(
 				}
 			},
 		},
+		image: {
+			type: String,
+		},
+		registeredIn: [
+			{
+				type: mongoose.Schema.Types.ObjectId,
+				ref: "Event",
+			},
+		],
 		tokens: [{ type: String }],
 	},
 	{
