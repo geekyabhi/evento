@@ -1,6 +1,7 @@
 const mongoose = require("mongoose");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
+const Society = require("./Society.model");
 
 const UserSchema = mongoose.Schema(
 	{
@@ -38,9 +39,14 @@ const UserSchema = mongoose.Schema(
 			type: Boolean,
 			default: false,
 		},
-		adminOf: {
-			type: String,
-			default: "None",
+		society: {
+			type: mongoose.Schema.Types.ObjectId,
+			ref: "Society",
+			default: "61829ff4dbdb48788a122c9b",
+		},
+		isSuperAdmin: {
+			type: Boolean,
+			default: false,
 		},
 		tokens: [{ type: String }],
 	},

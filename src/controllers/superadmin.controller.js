@@ -1,20 +1,14 @@
-const User = require("../models/User.model");
+const SuperUser = require("../models/SuperUser.model");
 const router = require("../routes/user.routes");
 const generateToken = require("../utils/generateToken");
 
 const register = async (req, res) => {
 	try {
-		const { name, collegeId, password, year } = req.body;
-		if (!name) {
+		const { username, password } = req.body;
+		if (!username) {
 			return res.status(400).send({
 				success: false,
-				error: "Please enter your name",
-			});
-		}
-		if (!collegeId) {
-			return res.status(400).send({
-				success: false,
-				error: "Please enter your college Id",
+				error: "Please enter username",
 			});
 		}
 		if (!password) {
@@ -23,24 +17,20 @@ const register = async (req, res) => {
 				error: "Please enter your password",
 			});
 		}
-		const preUser = await User.findOne({ collegeId: collegeId });
+		const preUser = await SuperUser.findOne({ username: username });
 		if (preUser) {
 			return res.status(400).send({
 				success: false,
-				error: "User with same college id already exist",
+				error: "User with same username already exist",
 			});
 		}
-		const user = new User({ name, collegeId, password, year });
+		const user = new SuperUser({ username, password });
 		const savedUser = await user.save();
 		res.status(200).send({
 			success: true,
 			data: {
 				_id: savedUser._id,
-				name: savedUser.name,
-				collegeId: savedUser.collegeId,
-				isAdmin: savedUser.isAdmin,
-				society: savedUser.society,
-				year: savedUser.year,
+				username: savedUser.username,
 			},
 		});
 	} catch (e) {
@@ -54,11 +44,11 @@ const register = async (req, res) => {
 
 const login = async (req, res) => {
 	try {
-		const { collegeId, password } = req.body;
-		if (!collegeId) {
+		const { username, password } = req.body;
+		if (!username) {
 			return res.status(400).send({
 				success: false,
-				error: "Please enter your college Id",
+				error: "Please enter your username",
 			});
 		}
 		if (!password) {
@@ -67,9 +57,7 @@ const login = async (req, res) => {
 				error: "Please enter your password",
 			});
 		}
-		const user = await User.findOne({ collegeId: collegeId }).populate(
-			"society"
-		);
+		const user = await SuperUser.findOne({ username: username });
 		if (user && (await user.matchPassword(password))) {
 			const currentToken = generateToken(user._id);
 			const updatedTokens = [...user.tokens, currentToken];
@@ -79,11 +67,7 @@ const login = async (req, res) => {
 				success: true,
 				data: {
 					_id: user._id,
-					name: user.name,
-					collegeId: user.collegeId,
-					isAdmin: user.isAdmin,
-					society: user.society,
-					year: user.year,
+					username: user.username,
 					token: currentToken,
 					tokens: user.tokens,
 				},
@@ -156,77 +140,4 @@ const logoutAll = async (req, res) => {
 	}
 };
 
-const find = async (req, res) => {
-	try {
-		const user = req.user;
-		return res.status(200).send({
-			success: true,
-			data: user,
-		});
-	} catch (e) {
-		console.log(e);
-		return res.status(500).send({
-			success: false,
-			error: `Server error${e}`,
-		});
-	}
-};
-
-const update = async (req, res) => {
-	try {
-		const { name, collegeId, password, year } = req.body;
-		const user = req.user;
-		user.name = name || user.name;
-		user.collegeId = collegeId || user.collegeId;
-		user.year = year || user.year;
-
-		if (password) {
-			user.password = password;
-		}
-		const savedUser = await user.save();
-		res.status(200).send({
-			success: true,
-			data: {
-				_id: savedUser._id,
-				name: savedUser.name,
-				collegeId: savedUser.collegeId,
-				isAdmin: savedUser.isAdmin,
-				society: savedUser.society,
-				year: savedUser.year,
-			},
-		});
-	} catch (e) {
-		console.log(e);
-		return res.status(500).send({
-			success: false,
-			error: `Server error ${e}`,
-		});
-	}
-};
-
-const remove = async (req, res) => {
-	try {
-		const user = req.user;
-		const savedUser = user;
-		await user.remove();
-		res.status(200).send({
-			success: true,
-			data: {
-				_id: savedUser._id,
-				name: savedUser.name,
-				collegeId: savedUser.collegeId,
-				isAdmin: savedUser.isAdmin,
-				society: savedUser.society,
-				year: savedUser.year,
-			},
-		});
-	} catch (e) {
-		console.log(e);
-		return res.status(500).send({
-			success: false,
-			error: `Server error ${e}`,
-		});
-	}
-};
-
-module.exports = { register, login, logout, logoutAll, find, update, remove };
+module.exports = { register, login, logout, logoutAll };
