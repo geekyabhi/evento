@@ -1,5 +1,6 @@
 const mongoose = require("mongoose");
 const bcrypt = require("bcrypt");
+const Registration = require("./Registration.model");
 
 const UserSchema = mongoose.Schema(
 	{
@@ -76,6 +77,19 @@ UserSchema.pre("save", async function (next) {
 		next();
 	} catch (e) {
 		console.log(`Error occured while hashing password ${e}`);
+	}
+});
+
+UserSchema.pre("remove", async function (next) {
+	try {
+		const user = this;
+		const registrations = await Registration.find({ user: user._id });
+		for (let i = 0; i < registrations.length; i++) {
+			await registrations[i].remove();
+		}
+		process.exit(0);
+	} catch (e) {
+		console.log(`Error occured while pre removing user ${e}`);
 	}
 });
 

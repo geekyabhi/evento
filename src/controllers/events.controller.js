@@ -2,6 +2,12 @@ const { events } = require("../models/Events.model");
 const Event = require("../models/Events.model");
 const Society = require("../models/Society.model");
 
+const { promisify } = require("util");
+var fs = require("fs");
+const writeFilePromise = promisify(fs.writeFile);
+const ObjectsToCsv = require("objects-to-csv");
+const uploadToCloudinary = require("../utils/cloudinaryUploader");
+
 const addEvents = async (req, res) => {
 	try {
 		const loggedSociety = req.society;
@@ -123,6 +129,62 @@ const getEvent = async (req, res) => {
 	}
 };
 
+const createExelOfRegistrations = async (req, res) => {
+	try {
+		const { id } = req.params;
+		const society = req.society;
+		const event = await Event.findById(id).populate({
+			path: "registrations",
+			populate: {
+				path: "user",
+				select: [
+					"-tokens",
+					"-password",
+					"-registeredIn",
+					"-updatedAt",
+					"-createdAt",
+					"-__v",
+				],
+			},
+		});
+		if (!event) {
+			return res.status(400).send({
+				success: false,
+				error: "No such event found",
+			});
+		}
+		if (String(event.society) !== String(society._id)) {
+			return res.status(401).send({
+				success: false,
+				error: "Not authorized",
+			});
+		}
+		const newData = [];
+		event.registrations.forEach((registration) => {
+			let obj = JSON.parse(JSON.stringify(registration.user));
+			delete obj["_id"];
+			newData.push(obj);
+		});
+
+		const csv = new ObjectsToCsv(newData);
+		await csv.toDisk(`${event.name}.csv`);
+
+		const path = `${event.name}.csv`;
+
+		const url = await uploadToCloudinary(path);
+		return res.status(200).send({
+			success: true,
+			data: url,
+		});
+	} catch (e) {
+		console.log(e);
+		return res.status(500).send({
+			success: false,
+			error: `Server error ${e}`,
+		});
+	}
+};
+
 const updateEvents = async (req, res) => {
 	try {
 		const { id } = req.params;
@@ -216,4 +278,11 @@ const deleteEvents = async (req, res) => {
 	}
 };
 
-module.exports = { addEvents, updateEvents, deleteEvents, getEvents, getEvent };
+module.exports = {
+	addEvents,
+	updateEvents,
+	deleteEvents,
+	getEvents,
+	getEvent,
+	createExelOfRegistrations,
+};
