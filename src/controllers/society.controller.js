@@ -55,6 +55,8 @@ const loginSociety = async (req, res) => {
 	try {
 		const { handle, password } = req.body;
 		const society = await Society.findOne({ handle });
+
+		console.log(society);
 		if (society && (await society.matchPassword(password))) {
 			const currentToken = generateToken(society._id);
 			const updatedTokens = [...society.tokens, currentToken];
@@ -68,6 +70,11 @@ const loginSociety = async (req, res) => {
 					handle: society.handle,
 					token: currentToken,
 				},
+			});
+		} else {
+			return res.status(400).send({
+				success: false,
+				error: "Wrong handle or password",
 			});
 		}
 	} catch (e) {

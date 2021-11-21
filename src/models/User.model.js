@@ -14,6 +14,14 @@ const UserSchema = mongoose.Schema(
 			unique: true,
 			trim: true,
 		},
+		branch: {
+			type: String,
+			trim: true,
+		},
+		section: {
+			type: String,
+			trim: true,
+		},
 		password: {
 			type: String,
 			require: [true, "Please enter the password"],

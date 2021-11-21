@@ -1,4 +1,6 @@
+const { events } = require("../models/Events.model");
 const Event = require("../models/Events.model");
+const Society = require("../models/Society.model");
 
 const addEvents = async (req, res) => {
 	try {
@@ -42,6 +44,75 @@ const addEvents = async (req, res) => {
 		res.status(200).send({
 			success: true,
 			data: savedEvent,
+		});
+	} catch (e) {
+		console.log(e);
+		return res.status(500).send({
+			success: false,
+			error: `Server error ${e}`,
+		});
+	}
+};
+
+const getEvents = async (req, res) => {
+	try {
+		const society = req.society;
+		const societyId = society._id;
+		const data = await Event.find({ society: societyId }).populate(
+			"registrations"
+		);
+		if (!data) {
+			return res.status(404).send({
+				success: false,
+				error: "Unable to find events",
+			});
+		}
+		return res.status(200).send({
+			success: true,
+			data: data,
+		});
+	} catch (e) {
+		console.log(e);
+		return res.status(500).send({
+			success: false,
+			error: `Server error ${e}`,
+		});
+	}
+};
+
+const getEvent = async (req, res) => {
+	try {
+		const { id } = req.params;
+		const society = req.society;
+		const event = await Event.findById(id).populate({
+			path: "registrations",
+			populate: {
+				path: "user",
+				select: [
+					"-tokens",
+					"-password",
+					"-registeredIn",
+					"-updatedAt",
+					"-createdAt",
+					"-__v",
+				],
+			},
+		});
+		if (!event) {
+			return res.status(400).send({
+				success: false,
+				error: "No such event found",
+			});
+		}
+		if (String(event.society) !== String(society._id)) {
+			return res.status(401).send({
+				success: false,
+				error: "Not authorized",
+			});
+		}
+		return res.status(200).send({
+			success: true,
+			data: event,
 		});
 	} catch (e) {
 		console.log(e);
@@ -145,4 +216,4 @@ const deleteEvents = async (req, res) => {
 	}
 };
 
-module.exports = { addEvents, updateEvents, deleteEvents };
+module.exports = { addEvents, updateEvents, deleteEvents, getEvents, getEvent };

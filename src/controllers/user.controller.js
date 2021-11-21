@@ -4,7 +4,16 @@ const generateToken = require("../utils/generateToken");
 
 const register = async (req, res) => {
 	try {
-		const { name, collegeId, password, year, image, gender } = req.body;
+		const {
+			name,
+			collegeId,
+			password,
+			year,
+			image,
+			gender,
+			section,
+			branch,
+		} = req.body;
 		if (!name) {
 			return res.status(400).send({
 				success: false,
@@ -37,6 +46,8 @@ const register = async (req, res) => {
 			year,
 			image,
 			gender,
+			section,
+			branch,
 		});
 		const savedUser = await user.save();
 		res.status(200).send({
@@ -48,6 +59,8 @@ const register = async (req, res) => {
 				year: savedUser.year,
 				image: savedUser.image,
 				gender: savedUser.gender,
+				section: savedUser.section,
+				branch: savedUser.branch,
 			},
 		});
 	} catch (e) {
@@ -90,6 +103,8 @@ const login = async (req, res) => {
 					image: user.image,
 					gender: user.gender,
 					token: currentToken,
+					section: user.section,
+					branch: user.branch,
 				},
 			});
 		} else {
@@ -178,7 +193,16 @@ const find = async (req, res) => {
 
 const update = async (req, res) => {
 	try {
-		const { name, collegeId, password, year, image, gender } = req.body;
+		const {
+			name,
+			collegeId,
+			password,
+			year,
+			image,
+			gender,
+			section,
+			branch,
+		} = req.body;
 
 		const preUser = await User.findOne({ collegeId: collegeId });
 		if (preUser && String(preUser._id) !== String(req.user._id)) {
@@ -194,6 +218,8 @@ const update = async (req, res) => {
 		user.year = year || user.year;
 		user.image = image || user.image;
 		user.gender = gender || user.gender;
+		user.branch = branch || user.branch;
+		user.section = section || user.section;
 
 		if (password) {
 			user.password = password;
@@ -208,6 +234,8 @@ const update = async (req, res) => {
 				year: savedUser.year,
 				image: savedUser.image,
 				gender: savedUser.gender,
+				section: savedUser.section,
+				branch: savedUser.branch,
 			},
 		});
 	} catch (e) {
@@ -233,6 +261,8 @@ const remove = async (req, res) => {
 				year: savedUser.year,
 				image: savedUser.image,
 				gender: savedUser.gender,
+				section: savedUser.section,
+				branch: savedUser.branch,
 			},
 		});
 	} catch (e) {
