@@ -1,4 +1,5 @@
 const User = require("../models/User.model");
+const Event = require("../models/Events.model");
 const router = require("../routes/user.routes");
 const generateToken = require("../utils/generateToken");
 
@@ -274,4 +275,43 @@ const remove = async (req, res) => {
 	}
 };
 
-module.exports = { register, login, logout, logoutAll, find, update, remove };
+const getAllEvents = async (req, res) => {
+	try {
+		const QRY = req.query;
+		const data = await Event.find(QRY)
+			.select(["-__v", "-registrations"])
+			.populate([
+				{
+					path: "society",
+					select: ["-tokens", "-__v", "-password", "-events"],
+				},
+			]);
+		if (!data) {
+			return res.status(400).send({
+				success: false,
+				error: `Unable to fetch events`,
+			});
+		}
+		return res.status(200).send({
+			success: true,
+			data: data,
+		});
+	} catch (e) {
+		console.log(e);
+		return res.status(500).send({
+			success: false,
+			error: `Server error ${e}`,
+		});
+	}
+};
+
+module.exports = {
+	register,
+	login,
+	logout,
+	logoutAll,
+	find,
+	update,
+	remove,
+	getAllEvents,
+};
