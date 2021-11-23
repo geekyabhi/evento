@@ -39,6 +39,9 @@ const EventSchema = mongoose.Schema(
 			default: Date.now(),
 			required: true,
 		},
+		cta: {
+			type: String,
+		},
 		registrations: [
 			{
 				type: mongoose.Schema.Types.ObjectId,

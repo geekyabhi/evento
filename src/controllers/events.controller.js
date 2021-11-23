@@ -11,7 +11,8 @@ const uploadToCloudinary = require("../utils/cloudinaryUploader");
 const addEvents = async (req, res) => {
 	try {
 		const loggedSociety = req.society;
-		const { name, description, image, location, dateAndTime } = req.body;
+		const { name, description, image, location, dateAndTime, cta } =
+			req.body;
 		if (!(name && description && location)) {
 			return res.status(400).send({
 				success: false,
@@ -42,6 +43,7 @@ const addEvents = async (req, res) => {
 			dateAndTime,
 			contactDetails: contact,
 			speakers,
+			cta,
 		});
 		const savedEvent = await event.save();
 		const preEvents = loggedSociety.events;
