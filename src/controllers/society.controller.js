@@ -67,6 +67,7 @@ const loginSociety = async (req, res) => {
 				data: {
 					_id: society._id,
 					name: society.name,
+					image: society.image,
 					handle: society.handle,
 					token: currentToken,
 				},

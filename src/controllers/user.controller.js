@@ -103,6 +103,7 @@ const login = async (req, res) => {
 					year: user.year,
 					image: user.image,
 					gender: user.gender,
+					registeredIn: user.registeredIn,
 					token: currentToken,
 					section: user.section,
 					branch: user.branch,
