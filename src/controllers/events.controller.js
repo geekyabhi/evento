@@ -217,12 +217,7 @@ const updateEvents = async (req, res) => {
 		event.image = image || event.image;
 		event.location = location || event.location;
 		event.dateAndTime = dateAndTime || event.dateAndTime;
-		event.contactDetails.name = contact
-			? contact.name || event.contactDetails.name
-			: event.contactDetails.name;
-		event.contactDetails.number = contact
-			? contact.number || event.contactDetails.number
-			: event.contactDetails.number;
+		event.contactDetails = { ...contact };
 		event.speakers = speakers || event.speakers;
 
 		const savedEvent = await event.save();
