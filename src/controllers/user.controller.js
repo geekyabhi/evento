@@ -221,6 +221,8 @@ const update = async (req, res) => {
 			password,
 			year,
 			image,
+			email,
+			phone,
 			gender,
 			section,
 			branch,
@@ -242,6 +244,8 @@ const update = async (req, res) => {
 		user.gender = gender || user.gender;
 		user.branch = branch || user.branch;
 		user.section = section || user.section;
+		user.phone = phone || user.phone;
+		user.email = email || user.email;
 
 		if (password) {
 			user.password = password;
@@ -258,6 +262,8 @@ const update = async (req, res) => {
 				gender: savedUser.gender,
 				section: savedUser.section,
 				branch: savedUser.branch,
+				email: savedUser.email,
+				phone: savedUser.phone,
 			},
 		});
 	} catch (e) {
