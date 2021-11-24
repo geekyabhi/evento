@@ -15,6 +15,14 @@ const UserSchema = mongoose.Schema(
 			unique: true,
 			trim: true,
 		},
+		email: {
+			type: String,
+			require: true,
+		},
+		phone: {
+			type: String,
+			required: true,
+		},
 		branch: {
 			type: String,
 			trim: true,

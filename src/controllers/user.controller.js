@@ -10,6 +10,8 @@ const register = async (req, res) => {
 			collegeId,
 			password,
 			year,
+			email,
+			phone,
 			image,
 			gender,
 			section,
@@ -33,6 +35,18 @@ const register = async (req, res) => {
 				error: "Please enter your password",
 			});
 		}
+		if (!email) {
+			return res.status(400).send({
+				success: false,
+				error: "Please enter your email",
+			});
+		}
+		if (!phone) {
+			return res.status(400).send({
+				success: false,
+				error: "Please enter your phone number",
+			});
+		}
 		const preUser = await User.findOne({ collegeId: collegeId });
 		if (preUser) {
 			return res.status(400).send({
@@ -48,6 +62,8 @@ const register = async (req, res) => {
 			image,
 			gender,
 			section,
+			email,
+			phone,
 			branch,
 		});
 		const savedUser = await user.save();
@@ -62,6 +78,8 @@ const register = async (req, res) => {
 				gender: savedUser.gender,
 				section: savedUser.section,
 				branch: savedUser.branch,
+				email: savedUser.email,
+				phone: savedUser.phone,
 			},
 		});
 	} catch (e) {
@@ -103,6 +121,8 @@ const login = async (req, res) => {
 					year: user.year,
 					image: user.image,
 					gender: user.gender,
+					phone: user.phone,
+					email: user.email,
 					registeredIn: user.registeredIn,
 					token: currentToken,
 					section: user.section,
